@@ -145,7 +145,7 @@ def particion_entr_prueba(X,y,test=0.20):
     return X_train, X_test, y_train, y_test
 
 
-Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
+#Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
 # BORRAR
 '''#print(X_votos[0])
 #print(y_votos[0])
@@ -160,7 +160,7 @@ print(np.unique(ye_votos,return_counts=True))
 print(np.unique(yp_votos,return_counts=True))'''
 
 
-Xe_credito,Xp_credito,ye_credito,yp_credito =particion_entr_prueba(X_credito,y_credito,test=0.4)
+#Xe_credito,Xp_credito,ye_credito,yp_credito =particion_entr_prueba(X_credito,y_credito,test=0.4)
 # BORRAR
 '''print('CREDITO')
 print(np.unique(y_credito,return_counts=True))
@@ -352,6 +352,161 @@ print('Xe_credito[0]', Xe_credito[0])'''
 
 class ClasificadorNoEntrenado(Exception): pass
 
+class RegresionLogisticaMiniBatch():
+    
+    def __init__(self,normalizacion=False,vrate=0.1,rate_decay=False,batch_tam=64,vpesos_iniciales=None):
+        self.normalizacion = normalizacion
+        self.vrate = vrate
+        self.rate_decay = rate_decay
+        self.batch_tam = batch_tam
+        self.vpesos_iniciales = vpesos_iniciales
+        self.weights = vpesos_iniciales
+        self.isTrain = False
+
+    def normalize(self,data):
+        deviation = np.std(data, axis=0)
+        mean = np.mean(data, axis=0)
+        normalizeData = (data - mean)/deviation
+        self.deviation = deviation
+        self.mean = mean
+        return normalizeData
+    
+    def prob(self, X, weights):
+        return 1/(1+np.e**(-np.dot(X, weights)))
+
+    def entrena(self,entr,clas_entr,n_epochs=1000, reiniciar_pesos=False):
+        print('entrena')
+        self.y_class = np.unique(clas_entr)
+        clas_entr = np.where(clas_entr == self.y_class[1], 1, 0)
+        #clas_entr = [0 if y == self.y_class[0] else 1 for y in clas_entr]
+        #clas_entr = np.array(clas_entr)
+        print(entr.shape)
+        X_train = entr
+        if self.normalizacion:
+            X_train = self.normalize(X_train)
+
+        if reiniciar_pesos or self.vpesos_iniciales == None:
+            self.weights = np.random.uniform(-1, 1, (X_train.shape[1]+1,))
+        
+        num_batches = int(X_train.shape[0] / self.batch_tam)
+        #print(X_train.shape[0])
+        #print(self.batch_tam)
+        #print('num_batches: ', num_batches)
+        weights = self.weights
+        print('weights.shape', weights.dtype)
+        rate_0 = self.vrate
+        
+        for epoch in range(n_epochs):
+            indexes_random = np.random.permutation(X_train.shape[0])
+            X_train = X_train[indexes_random,:]
+            clas_entr = clas_entr[indexes_random]
+
+            rate = self.vrate
+
+            for num_batch in range(num_batches):
+                X_mini_batch = X_train[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam, :]
+                Y_mini_batch = clas_entr[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam]
+                X0 = np.ones((X_mini_batch.shape[0], 1))
+                #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
+                X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
+                
+                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
+                #o = self.prob(X_mini_batch, weights)
+                #sum = np.dot((Y_mini_batch - o), X_mini_batch)
+                #weights = weights + rate * np.dot((Y_mini_batch - o), X_mini_batch)
+                #weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
+                #o = np.dot(X_mini_batch,weights)
+                #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
+
+                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
+                o = self.prob(X_mini_batch, weights)
+                weights = weights + rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o)))
+                
+                '''print('num_batch: ', num_batch)
+                print('QUEEE: ', weights)
+                for j in range(len(weights)):
+                    for i in range(len(X_mini_batch)):
+                        #weight_aux = X_mini_batch[i][j] * (Y_mini_batch[i] - o[i])
+                        test = weights[j]
+                        weights[j] = test + rate * (X_mini_batch[i][j] * (Y_mini_batch[i] - o[i]))'''
+            if X_train.shape[0] % self.batch_tam != 0:
+                X_mini_batch = X_train[num_batches*self.batch_tam : X_train.shape[0], :]
+                Y_mini_batch = clas_entr[num_batches*self.batch_tam : X_train.shape[0]]
+                X0 = np.ones((X_mini_batch.shape[0], 1))
+                #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
+                X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
+                
+                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
+                #o = self.prob(X_mini_batch, weights)
+                #sum = np.dot((Y_mini_batch - o), X_mini_batch)
+                #weights = weights + rate * np.dot((Y_mini_batch - o), X_mini_batch)
+                #weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
+                #o = np.dot(X_mini_batch,weights)
+                #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
+
+                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
+                o = self.prob(X_mini_batch, weights)
+                weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
+                '''for j in range(len(weights)):
+                    for i in range(len(X_mini_batch)):
+                        #weight_aux = X_mini_batch[i][j] * (Y_mini_batch[i] - o[i])
+                        test = weights[j]
+                        weights[j] = test + rate * (X_mini_batch[i][j] * (Y_mini_batch[i] - o[i]))'''
+            if self.rate_decay:
+                rate = (rate_0)*(1/(1+epoch))
+
+        self.weights = weights
+        self.isTrain = True
+        #return weights
+            
+
+    def clasifica_prob(self,E):
+        print('clasifica_prob')
+        if not self.isTrain:
+            raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
+        
+        if self.normalizacion:
+            E = (E - self.mean)/self.deviation
+        X0 = np.ones((E.shape[0], 1))
+        #E_x = np.append(E, X0, axis = 1)
+        E_x = np.copy(E)
+        E_x = np.insert(E_x, 0, 1, axis = 1)
+        return self.prob(E_x, self.weights)
+
+    def clasifica(self,E):
+        print('clasifica')
+        if not self.isTrain:
+            raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
+        #if self.normalizacion:
+        #    E = (E - self.mean)/self.deviation
+        E_x = np.copy(E)
+        y_proba = self.clasifica_prob(E_x)
+        #y_proba[y_proba >= 0.5] = self.y_class[1]
+        '''classification = np.empty((E.shape[0],1), dtype = self.y_class.dtype)
+        classification[y_proba >= 0.5] = self.y_class[1]
+        classification[y_proba < 0.5] = self.y_class[0]'''
+        print('y_proba')
+        print(y_proba)
+        print(y_proba.max())
+        print(y_proba.min())
+        classification = np.where(y_proba > 0.5,self.y_class[1],self.y_class[0])
+        return classification
+
+#         ......
+
+Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
+#ye_votos_trans = [0 if y == ye_votos[0] else 1 for y in ye_votos]
+#print(np.unique(ye_votos_trans))
+RLMB_votos=RegresionLogisticaMiniBatch(normalizacion=True)
+#weigths = RLMB_votos.entrena(Xe_votos, ye_votos)
+#print('RESULT entrena:', weigths)
+RLMB_votos.entrena(Xe_votos, ye_votos)
+probabilidad = RLMB_votos.clasifica_prob(Xp_votos)
+print('probabilidad')
+print(probabilidad)
+clasificacion = RLMB_votos.clasifica(Xp_votos)
+print('clasificacion')
+print(clasificacion)
 
 
 
@@ -397,6 +552,8 @@ def rendimiento(clasif,X,y):
 # In [6]: rendimiento(RLMB_votos,Xp_votos,yp_votos)
 # Out[6]: 0.9080459770114943    
 
+score = rendimiento(RLMB_votos,Xp_votos,yp_votos)
+print(score)
 # ---------------------------------------------------------------------
 
 # CON LOS DATOS DEL CÀNCER
