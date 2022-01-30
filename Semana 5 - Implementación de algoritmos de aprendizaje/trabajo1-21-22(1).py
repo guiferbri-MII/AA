@@ -47,6 +47,8 @@ X_votos = carga_datos.X_votos
 y_votos = carga_datos.y_votos
 X_credito = carga_datos.X_credito
 y_credito = carga_datos.y_credito
+X_cancer = carga_datos.X_cancer
+y_cancer = carga_datos.y_cancer
 
 # SE PENALIZARÁ el uso de bucles convencionales si la misma tarea se puede
 # hacer más eficiente con operaciones entre arrays que proporciona numpy. 
@@ -371,16 +373,14 @@ class RegresionLogisticaMiniBatch():
         self.mean = mean
         return normalizeData
     
-    def prob(self, X, weights):
+    def pred(self, X, weights):
         return 1/(1+np.e**(-np.dot(X, weights)))
 
     def entrena(self,entr,clas_entr,n_epochs=1000, reiniciar_pesos=False):
-        print('entrena')
         self.y_class = np.unique(clas_entr)
         clas_entr = np.where(clas_entr == self.y_class[1], 1, 0)
         #clas_entr = [0 if y == self.y_class[0] else 1 for y in clas_entr]
         #clas_entr = np.array(clas_entr)
-        print(entr.shape)
         X_train = entr
         if self.normalizacion:
             X_train = self.normalize(X_train)
@@ -393,7 +393,6 @@ class RegresionLogisticaMiniBatch():
         #print(self.batch_tam)
         #print('num_batches: ', num_batches)
         weights = self.weights
-        print('weights.shape', weights.dtype)
         rate_0 = self.vrate
         
         for epoch in range(n_epochs):
@@ -403,10 +402,11 @@ class RegresionLogisticaMiniBatch():
 
             rate = self.vrate
 
+            #ToDo: Unificar for y el if
             for num_batch in range(num_batches):
                 X_mini_batch = X_train[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam, :]
                 Y_mini_batch = clas_entr[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam]
-                X0 = np.ones((X_mini_batch.shape[0], 1))
+                #X0 = np.ones((X_mini_batch.shape[0], 1))
                 #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
                 X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
                 
@@ -419,7 +419,7 @@ class RegresionLogisticaMiniBatch():
                 #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
 
                 #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
-                o = self.prob(X_mini_batch, weights)
+                o = self.pred(X_mini_batch, weights)
                 weights = weights + rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o)))
                 
                 '''print('num_batch: ', num_batch)
@@ -432,7 +432,7 @@ class RegresionLogisticaMiniBatch():
             if X_train.shape[0] % self.batch_tam != 0:
                 X_mini_batch = X_train[num_batches*self.batch_tam : X_train.shape[0], :]
                 Y_mini_batch = clas_entr[num_batches*self.batch_tam : X_train.shape[0]]
-                X0 = np.ones((X_mini_batch.shape[0], 1))
+                #X0 = np.ones((X_mini_batch.shape[0], 1))
                 #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
                 X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
                 
@@ -445,7 +445,7 @@ class RegresionLogisticaMiniBatch():
                 #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
 
                 #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
-                o = self.prob(X_mini_batch, weights)
+                o = self.pred(X_mini_batch, weights)
                 weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
                 '''for j in range(len(weights)):
                     for i in range(len(X_mini_batch)):
@@ -461,20 +461,20 @@ class RegresionLogisticaMiniBatch():
             
 
     def clasifica_prob(self,E):
-        print('clasifica_prob')
+        #print('clasifica_prob')
         if not self.isTrain:
             raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
         
         if self.normalizacion:
             E = (E - self.mean)/self.deviation
-        X0 = np.ones((E.shape[0], 1))
+        #X0 = np.ones((E.shape[0], 1))
         #E_x = np.append(E, X0, axis = 1)
         E_x = np.copy(E)
         E_x = np.insert(E_x, 0, 1, axis = 1)
-        return self.prob(E_x, self.weights)
+        return self.pred(E_x, self.weights)
 
     def clasifica(self,E):
-        print('clasifica')
+        #print('clasifica')
         if not self.isTrain:
             raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
         #if self.normalizacion:
@@ -485,28 +485,23 @@ class RegresionLogisticaMiniBatch():
         '''classification = np.empty((E.shape[0],1), dtype = self.y_class.dtype)
         classification[y_proba >= 0.5] = self.y_class[1]
         classification[y_proba < 0.5] = self.y_class[0]'''
-        print('y_proba')
-        print(y_proba)
-        print(y_proba.max())
-        print(y_proba.min())
         classification = np.where(y_proba > 0.5,self.y_class[1],self.y_class[0])
         return classification
 
 #         ......
 
 Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
-#ye_votos_trans = [0 if y == ye_votos[0] else 1 for y in ye_votos]
-#print(np.unique(ye_votos_trans))
+# ToDo: DESCOMENTAR!!!
 RLMB_votos=RegresionLogisticaMiniBatch(normalizacion=True)
 #weigths = RLMB_votos.entrena(Xe_votos, ye_votos)
 #print('RESULT entrena:', weigths)
 RLMB_votos.entrena(Xe_votos, ye_votos)
 probabilidad = RLMB_votos.clasifica_prob(Xp_votos)
-print('probabilidad')
-print(probabilidad)
+#print('probabilidad')
+#print(probabilidad)
 clasificacion = RLMB_votos.clasifica(Xp_votos)
-print('clasificacion')
-print(clasificacion)
+#print('clasificacion')
+#print(clasificacion)
 
 
 
@@ -551,9 +546,9 @@ def rendimiento(clasif,X,y):
         
 # In [6]: rendimiento(RLMB_votos,Xp_votos,yp_votos)
 # Out[6]: 0.9080459770114943    
-
-score = rendimiento(RLMB_votos,Xp_votos,yp_votos)
-print(score)
+# ToDo: DESCOMENTAR!!!
+'''score_votes = rendimiento(RLMB_votos,Xp_votos,yp_votos)
+print(score_votes)'''
 # ---------------------------------------------------------------------
 
 # CON LOS DATOS DEL CÀNCER
@@ -578,6 +573,15 @@ print(score)
 # In[11]: rendimiento(RLMB_cancer,Xp_cancer,yp_cancer)
 # Out[11]: 0.9557522123893806
 
+Xe_cancer,Xp_cancer,ye_cancer,yp_cancer = particion_entr_prueba(X_cancer,y_cancer)
+# ToDo: DESCOMENTAR!!!
+'''RLMB_cancer=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
+RLMB_cancer.entrena(Xe_cancer,ye_cancer)
+RLMB_cancer.clasifica_prob(Xp_cancer)
+#print(RLMB_cancer.clasifica(Xp_cancer))
+score_cancer = rendimiento(RLMB_cancer,Xp_cancer,yp_cancer)
+print('score_cancer')
+print(score_cancer)'''
 
 # =================================================
 # EJERCICIO 3: IMPLEMENTACIÓN DE VALIDACIÓN CRUZADA
@@ -604,7 +608,98 @@ print(score)
 # parámetros para llamar al constructor.
 
 # INDICACIÓN: para usar params al llamar al constructor del clasificador, usar
-# clase_clasificador(**params)  
+# clase_clasificador(**params)
+def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
+    num_fold = int(X.shape[0] / n)
+    y_values = np.unique(y)
+    print(np.unique(y,return_counts=True))
+    print('num_fold: ', num_fold)
+    #print(len(y))
+    scores = []
+    for i in range(n):
+
+        X_train_data, X_test_data = np.empty((0,X.shape[1])), np.empty((0,X.shape[1]))
+        y_train_data, y_test_data = np.empty((0,1)), np.empty((0,1))
+        for y_value in y_values:
+            y_value_indexes = np.where(y == y_value)[0]
+            #print(len(y_value_indexes))
+            y_value_indexes_random = np.random.permutation(y_value_indexes)
+            y_prop = round(len(y_value_indexes)/len(y),2)
+            #print('PROPORCION del valor: ', y_value)
+            #print(y_prop)
+            num_train_prop = int(round(y_prop*num_fold,0))
+            #print(num_train_prop)
+            
+            index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
+            X_train_data = np.append(X_train_data, X[index_train,:], axis = 0)
+            X_test_data = np.append(X_test_data, X[index_test,:], axis = 0)
+            y_train_data = np.append(y_train_data, y[index_train])        
+            y_test_data = np.append(y_test_data, y[index_test])
+            '''for y_value in y_values:
+                y_value_indexes = np.where(y == y_value)[0]
+                y_value_indexes_random = np.random.permutation(y_value_indexes)
+                num_train_prop = int((1-test)*len(y_value_indexes))
+                index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
+                #print(X[index_train,:][0])
+                X_train = np.append(X_train, X[index_train,:], axis = 0)
+                X_test = np.append(X_test, X[index_test,:], axis = 0)
+                y_train = np.append(y_train, y[index_train])        
+                y_test = np.append(y_test, y[index_test])'''
+            
+            '''index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
+            #print(X[index_train,:][0])
+            X_train = np.append(X_train, X[index_train,:], axis = 0)
+            X_test = np.append(X_test, X[index_test,:], axis = 0)
+            y_train = np.append(y_train, y[index_train])        
+            y_test = np.append(y_test, y[index_test])'''
+
+        #print('ESTRATIFICADOS?: ')
+        #print('y_train_data: ', np.unique(y_train_data,return_counts=True))
+        #print('y_test_data: ', np.unique(y_test_data,return_counts=True))
+
+        classifier = clase_clasificador(**params)  
+        classifier.entrena(X_train_data, y_train_data)
+        score_fold = rendimiento(classifier,X_test_data,y_test_data)
+        print('score_fold, ', score_fold)
+        scores.append(score_fold)        
+
+        '''indexes = np.random.permutation(X.shape[0])
+        index_train, index_test = indexes[:num_train], indexes[num_train:]
+        X_train, X_test = X[index_train,:], X[index_test,:]
+        y_train, y_test = y[index_train], y[index_test]
+        return X_train, X_test, y_train, y_test'''
+        '''indexes = np.random.permutation(X.shape[0])
+        X_random = X[indexes]
+        y_random = y[indexes]
+
+        X_fold_test = X_random[i*num_fold : (i+1)*num_fold, :]
+        #X_fold_train = X[(i+2)*num_fold:,]
+        #print(i+n)
+        #X_fold_test = X[i*num_fold : (i+1)*num_fold]
+        X_fold_mask = np.isin(X_random, X_fold_test)
+        #X_fold_train = X[(i+n)*num_fold :]
+        X_fold_train = X_random[~X_fold_mask]
+        print('X_fold_test, ', X_fold_test)
+        #mask = np.isin(X, X_fold_test)
+        #prueba = np.delete(X, X_fold_test, axis = 0)
+        #prueba = X[~mask]
+        #print('prueba, ', prueba)
+        print('X_fold_train, ', X_fold_train)
+        Y_fold_test = y_random[i*num_fold : (i+1)*num_fold]
+        Y_fold_mask = np.isin(y_random, Y_fold_test)
+        Y_fold_train = y_random[~Y_fold_mask]
+        #Y_fold_train = y[(i+n)*num_fold:]
+        print('Y_fold_test, ', Y_fold_test)
+        print('Y_fold_train, ', Y_fold_train)'''
+    print('SCORES: ', scores)
+    scores_np = np.array(scores)
+    return np.mean(scores_np)
+
+X_prueba = np.array([11, 12, 13,14,15,16,17,18,19,20])
+Y_prueba = np.array([0,1,1,1,0,1,0,1,1,0])  
+# ToDo: DESCOMENTAR !!  
+#cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+#print(cancer_score_cross_val) 
 
 # ------------------------------------------------------------------------------
 # Ejemplo:
