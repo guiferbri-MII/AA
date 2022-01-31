@@ -49,6 +49,10 @@ X_credito = carga_datos.X_credito
 y_credito = carga_datos.y_credito
 X_cancer = carga_datos.X_cancer
 y_cancer = carga_datos.y_cancer
+X_train_imdb = carga_datos.X_train_imdb
+X_test_imdb = carga_datos.X_test_imdb
+y_train_imdb = carga_datos.y_train_imdb
+y_test_imdb = carga_datos.y_test_imdb
 
 # SE PENALIZARÁ el uso de bucles convencionales si la misma tarea se puede
 # hacer más eficiente con operaciones entre arrays que proporciona numpy. 
@@ -374,6 +378,7 @@ class RegresionLogisticaMiniBatch():
         return normalizeData
     
     def pred(self, X, weights):
+        #print(weights)
         return 1/(1+np.e**(-np.dot(X, weights)))
 
     def entrena(self,entr,clas_entr,n_epochs=1000, reiniciar_pesos=False):
@@ -612,7 +617,7 @@ print(score_cancer)'''
 def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
     num_fold = int(X.shape[0] / n)
     y_values = np.unique(y)
-    print(np.unique(y,return_counts=True))
+    #print(np.unique(y,return_counts=True))
     print('num_fold: ', num_fold)
     #print(len(y))
     scores = []
@@ -660,7 +665,7 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
         classifier = clase_clasificador(**params)  
         classifier.entrena(X_train_data, y_train_data)
         score_fold = rendimiento(classifier,X_test_data,y_test_data)
-        print('score_fold, ', score_fold)
+        #print('score_fold, ', score_fold)
         scores.append(score_fold)        
 
         '''indexes = np.random.permutation(X.shape[0])
@@ -691,15 +696,15 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
         #Y_fold_train = y[(i+n)*num_fold:]
         print('Y_fold_test, ', Y_fold_test)
         print('Y_fold_train, ', Y_fold_train)'''
-    print('SCORES: ', scores)
+    #print('SCORES: ', scores)
     scores_np = np.array(scores)
     return np.mean(scores_np)
 
 X_prueba = np.array([11, 12, 13,14,15,16,17,18,19,20])
 Y_prueba = np.array([0,1,1,1,0,1,0,1,1,0])  
 # ToDo: DESCOMENTAR !!  
-#cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
-#print(cancer_score_cross_val) 
+cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+print(cancer_score_cross_val) 
 
 # ------------------------------------------------------------------------------
 # Ejemplo:
@@ -756,8 +761,15 @@ Y_prueba = np.array([0,1,1,1,0,1,0,1,1,0])
 
 # Mostrar el proceso realizado en cada caso, y los rendimientos finales obtenidos. 
 
-
-
+# Votos
+'''votes_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
+print(votes_score_cross_val)
+# Cancer
+cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+print(cancer_score_cross_val)
+# IMDB
+imdb_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},X_train_imdb,y_train_imdb,n=5)
+print(imdb_score_cross_val)''' 
 
 # =====================================
 # EJERCICIO 5: CLASIFICACIÓN MULTICLASE
