@@ -53,6 +53,8 @@ X_train_imdb = carga_datos.X_train_imdb
 X_test_imdb = carga_datos.X_test_imdb
 y_train_imdb = carga_datos.y_train_imdb
 y_test_imdb = carga_datos.y_test_imdb
+X_iris = carga_datos.X_iris
+y_iris = carga_datos.y_iris
 
 # SE PENALIZARÁ el uso de bucles convencionales si la misma tarea se puede
 # hacer más eficiente con operaciones entre arrays que proporciona numpy. 
@@ -806,7 +808,54 @@ print(imdb_score_cross_val)'''
 
 
 #         ......
-        
+
+class RegresionLogisticaOvR():
+    def __init__(self,normalizacion=False,rate=0.1,rate_decay=False, batch_tam=64):
+        self.normalizacion = normalizacion
+        self.rate = rate
+        self.rate_decay = rate_decay
+        self.batch_tam = batch_tam
+        self.models = []
+         
+    def entrena(self,entr,clas_entr,n_epochs=1000):
+        self.y_class = np.unique(clas_entr)
+        for class_value in self.y_class:
+            clas_entr_trans = np.where(clas_entr == class_value, 1, 0)
+            classifier = RegresionLogisticaMiniBatch(normalizacion=self.normalizacion, vrate=self.rate, rate_decay=self.rate_decay, batch_tam=self.batch_tam)
+            classifier.entrena(entr, clas_entr_trans, n_epochs=n_epochs)
+            self.models.append(classifier)
+        self.isTrain = True
+
+    def clasifica(self,E):
+        if not self.isTrain:
+            raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
+        E_x = np.copy(E)
+        #best_model = self.models[1]
+        #best_proba = best_model.clasifica_prob(E_x)
+        #print(len(self.models))
+        #print('ccc, ', len(self.y_class))
+        scores = []
+        #scores = np.zeros((len(self.y_class), E.shape[0]))
+        #cont = 0
+        for model in self.models:
+            #print('AAA')
+            model_proba = model.clasifica_prob(E_x)
+            #print(model_proba)
+            scores.append(model_proba)
+            #scores[cont, :] = model_proba
+            '''if (model_proba > best_proba).all():
+                print('eeeee')
+                best_proba = model_proba
+                best_model = model'''
+            #cont += 1
+        np_scores = np.asarray(scores)
+        pred = np.argmax(np_scores, axis=0)
+        #print('pred, ', pred)
+        #max = np.amax(np_scores, axis=0)
+        #print(np.array(scores).shape)
+        #print('brbrbrbr, ', max)
+        #print('ffff, ', np.argmax(np_scores, axis=0))
+        return pred
 
 
 #  Los parámetros de los métodos significan lo mismo que en el
@@ -816,6 +865,14 @@ print(imdb_score_cross_val)'''
 
 
 # --------------------------------------------------------------------
+
+Xe_iris,Xp_iris,ye_iris,yp_iris = particion_entr_prueba(X_iris,y_iris,test=1/3)
+rl_iris=RegresionLogisticaOvR(rate=0.001,batch_tam=20)
+rl_iris.entrena(Xe_iris,ye_iris)
+score_iris_e = rendimiento(rl_iris,Xe_iris,ye_iris)
+print('score_iris_e: ', score_iris_e)
+score_iris_p = rendimiento(rl_iris,Xp_iris,yp_iris)
+print('score_iris_p: ', score_iris_p)
 
 # In[1] Xe_iris,Xp_iris,ye_iris,yp_iris          
 #            =particion_entr_prueba(X_iris,y_iris,test=1/3)
