@@ -704,8 +704,8 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
 X_prueba = np.array([11, 12, 13,14,15,16,17,18,19,20])
 Y_prueba = np.array([0,1,1,1,0,1,0,1,1,0])  
 # ToDo: DESCOMENTAR !!  
-cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
-print(cancer_score_cross_val) 
+'''cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+print(cancer_score_cross_val)'''
 
 # ------------------------------------------------------------------------------
 # Ejemplo:
@@ -763,6 +763,7 @@ print(cancer_score_cross_val)
 # Mostrar el proceso realizado en cada caso, y los rendimientos finales obtenidos. 
 
 # Votos
+# ToDo: DESCOMENTAR!!!
 '''votes_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
 print(votes_score_cross_val)
 # Cancer
@@ -864,14 +865,14 @@ class RegresionLogisticaOvR():
 
 
 # --------------------------------------------------------------------
-
-Xe_iris,Xp_iris,ye_iris,yp_iris = particion_entr_prueba(X_iris,y_iris,test=1/3)
+# ToDo: DESCOMENTAR!!!
+'''Xe_iris,Xp_iris,ye_iris,yp_iris = particion_entr_prueba(X_iris,y_iris,test=1/3)
 rl_iris=RegresionLogisticaOvR(rate=0.001,batch_tam=20)
 rl_iris.entrena(Xe_iris,ye_iris)
 score_iris_e = rendimiento(rl_iris,Xe_iris,ye_iris)
 print('score_iris_e: ', score_iris_e)
 score_iris_p = rendimiento(rl_iris,Xp_iris,yp_iris)
-print('score_iris_p: ', score_iris_p)
+print('score_iris_p: ', score_iris_p)'''
 
 # In[1] Xe_iris,Xp_iris,ye_iris,yp_iris          
 #            =particion_entr_prueba(X_iris,y_iris,test=1/3)
@@ -908,10 +909,82 @@ print('score_iris_p: ', score_iris_p)
 # "codificación one-hot", descrita en el tema "Preprocesado e ingeniería de características".
 # Se pide implementar esta transformación (directamete, SIN USAR Scikt Learn ni Pandas). 
 
+def oneHot(X):
+    X_code = np.copy(X)
+    #num_chars = 0
+    oneHotEncode = np.zeros((X.shape[0],0))
+    #column_all = []
+    for i in range(X.shape[1]):
+        column_values = np.unique(X[:,i])
+        #print(column_values)
+        #num_chars += len(column_values)
+        #mapping = {}
+        #for x in range(len(column_values)):
+        #    mapping[column_values[x]] = x
+        #print('mapping, ', mapping)
+        X_column = np.copy(X_code[:,i])
+        for j in range(len(column_values)):
+            X_column = np.where(X_column == column_values[j], j, X_column)
+            #column_all.append(column_values[j])
+        X_column = X_column.astype(np.int32)
+        #print(X_column)
+        arr = np.zeros((X.shape[0],len(column_values)), dtype=np.int32)
+        #print(arr.shape)
+        arr[np.arange(X_column.size),X_column] = 1
+        #print('ARR',arr)
+        '''for j in range(X.shape[0]):
+            arr = list(np.zeros(len(column_values), dtype = int))
+            print('X_code ij', X_code[j][i])
+            print('mapping[X_code[j][i]]', mapping[X_code[j][i]])
+            arr[mapping[X_code[j][i]]] = 1
+            print('ARRRRR, ', arr)
+            if j == 5:
+                break'''
+        #print(one_hot_encode)
+        oneHotEncode = np.append(oneHotEncode, arr, axis = 1)
+        #arr[mapping[c]] = 1
+    #arr = list(np.zeros(len(column_values), dtype = int))
+    #print('num_chars, ', num_chars)
+    #column_all = np.array(column_all)
+    return oneHotEncode#, column_all
+#prueba = np.eye(X_credito.shape[1])[X_credito]
+#print(prueba[:5])
+'''print(X_credito.shape)
+X_reshape = np.reshape(X_credito,-1)
+nb_classes = X_credito.shape[1]
+prueba = np.eye(nb_classes)[X_reshape]
+print(prueba[0])
+#print(np.unique(X_credito, axis = 0))'''
 
-     
-                
+X_credito_code = oneHot(X_credito)
+#print('AAAA',X_credito_code[:5])
+#X_credito_code_int = X_credito_code.astype(int)
+#X_reshape = np.reshape(X_credito_code_int,(X_credito.shape[0],-1))
+#prueba = np.eye(num_chars)[X_credito_code_int]
+#print(X_credito[0])
+#print(X_credito_code[0])
+'''print(X_credito[1])
+print(X_credito[2])
+print(X_credito[3])
+print(X_credito[4])
+vals = np.unique(X_credito[:,0])
+print(vals)
+print(np.arange(len(vals)))
+for i in range(len(vals)):
+    #print('i: ', i, ' vals: ', vals[i])
+    X_credito[:,0] = np.where(X_credito[:,0] == vals[i], i, X_credito[:,0])
 
+#print(X_credito[:5])'''
+# ToDo: DESCOMENTAR!!!
+'''
+Xe_credito,Xp_credito,ye_credito,yp_credito = particion_entr_prueba(X_credito_code,y_credito,test=1/3)
+rl_credito=RegresionLogisticaOvR(rate=0.001,batch_tam=20)
+rl_credito.entrena(Xe_credito,ye_credito)
+#print(X_credito_code.shape)
+score_credito_e = rendimiento(rl_credito,Xe_credito,ye_credito)
+print('score_credito_e: ', score_credito_e)
+score_credito_p = rendimiento(rl_credito,Xp_credito,yp_credito)
+print('score_credito_p: ', score_credito_p)'''
 
 # ---------------------------------------------------------
 # 6.2) Clasificación de imágenes de dígitos escritos a mano
