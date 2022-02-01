@@ -55,7 +55,6 @@ y_train_imdb = carga_datos.y_train_imdb
 y_test_imdb = carga_datos.y_test_imdb
 X_iris = carga_datos.X_iris
 y_iris = carga_datos.y_iris
-
 # SE PENALIZARÁ el uso de bucles convencionales si la misma tarea se puede
 # hacer más eficiente con operaciones entre arrays que proporciona numpy. 
 
@@ -855,7 +854,7 @@ class RegresionLogisticaOvR():
         #print(np.array(scores).shape)
         #print('brbrbrbr, ', max)
         #print('ffff, ', np.argmax(np_scores, axis=0))
-        return pred
+        return self.y_class[pred]
 
 
 #  Los parámetros de los métodos significan lo mismo que en el
