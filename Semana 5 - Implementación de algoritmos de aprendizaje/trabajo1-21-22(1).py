@@ -425,6 +425,7 @@ class RegresionLogisticaMiniBatch():
                 #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
 
                 #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
+                #print('X_mini_batch,  ', X_mini_batch.shape)
                 o = self.pred(X_mini_batch, weights)
                 weights = weights + rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o)))
                 
@@ -498,7 +499,7 @@ class RegresionLogisticaMiniBatch():
 
 Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
 # ToDo: DESCOMENTAR!!!
-RLMB_votos=RegresionLogisticaMiniBatch(normalizacion=True)
+'''RLMB_votos=RegresionLogisticaMiniBatch(normalizacion=True)
 #weigths = RLMB_votos.entrena(Xe_votos, ye_votos)
 #print('RESULT entrena:', weigths)
 RLMB_votos.entrena(Xe_votos, ye_votos)
@@ -507,7 +508,7 @@ probabilidad = RLMB_votos.clasifica_prob(Xp_votos)
 #print(probabilidad)
 clasificacion = RLMB_votos.clasifica(Xp_votos)
 #print('clasificacion')
-#print(clasificacion)
+#print(clasificacion)'''
 
 
 
@@ -1015,6 +1016,86 @@ print('score_credito_p: ', score_credito_p)'''
 # rate_decay para tratar de obtener un rendimiento aceptable (por encima del
 # 75% de aciertos sobre test). 
 
+def readDigitFile(X_data_file_path, y_data_file_path):
+    size = 28
+    X_data_file = open(X_data_file_path)
+    lines = X_data_file.readlines()
+    X_data = np.zeros((len(lines),size)).astype(np.int32)
+    #cont = 0
+    for i in range(len(lines)):
+        line = lines[i]
+        line = line.replace('\n', '')
+        np_line = np.array(list(line)).reshape(1,size)
+        np_line = np.where((np_line == '+') | (np_line == '#'), 1, 0)
+        X_data[i] = np_line
+        '''
+        np_line = np.array(list(line))
+        print('AAA, ', np_line)
+        print(np_line.shape)
+        
+        np_line_2 = np_line.reshape(1,size)
+        print('BBB, ', np_line_2)
+        print(np_line_2.shape)
+        np_line_2 = np.where((np_line_2 == '+') | (np_line_2 == '#'), 1, 0)
+        print('CCC')
+        print(np_line_2)
+        X_data[cont] = np_line_2
+        cont += 1
+        if cont == 10:
+            break'''
+    #X_data = np.array(lines)
+    #X_data_trans = np.where((X_data == '+') | (X_data == '#'), 1, 0)
+    #print(X_data[:30])
+    #print(lines[6])
+    #print(X_data[6])
+    #numbers = np.array_split(X_data, len(X_data)/28)
+    #numbers = [number.reshape(size*size,1) for number in numbers]
+    #np_numbers = np.asarray(numbers)
+    np_numbers = X_data.reshape(int(len(X_data)/28),size*size)
+    y_data_file = open(y_data_file_path)
+    y_lines = y_data_file.readlines()
+    y_lines = [line.replace('\n', '') for line in y_lines]
+    y_data = np.array(y_lines)
+    #print(y_data.shape)
+    return np_numbers, y_data
+    #numbers = [X_data[i:i+size] for i in range(0, len(X_data), size)]
+    '''print(len(numbers))
+    print(len(numbers[1]))
+    for numerito in numbers[1]:
+        print(numerito)'''
+    #prueba = np.genfromtxt(X_data_file_path, converters = )
+    #print(prueba)
 
+trainingimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/trainingimages"
+traininglabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/traininglabels"
+X_train, y_train = readDigitFile(trainingimages_path,traininglabels_path)
+validationimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/validationimages"
+validationlabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/validationlabels"
+X_val, y_val = readDigitFile(validationimages_path,validationlabels_path)
+testimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/testimages"
+testlabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/testlabels"
+X_test, y_test = readDigitFile(testimages_path,testlabels_path)
 
+# Con el conjunto de validacion para ver los parámetros
+rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
+rl_digit_val_1.entrena(X_val,y_val)
+score_digit_p_val_1 = rendimiento(rl_digit_val_1,X_test,y_test)
+print('score_digit_p_val_1: ', score_digit_p_val_1)
 
+rl_digit_val_2 = RegresionLogisticaOvR(rate=0.015,batch_tam=80)
+rl_digit_val_2.entrena(X_val,y_val)
+score_digit_p_val_2 = rendimiento(rl_digit_val_2,X_test,y_test)
+print('score_digit_p_val_2: ', score_digit_p_val_2)
+
+rl_digit_val_3 = RegresionLogisticaOvR(rate=0.001,rate_decay=True,batch_tam=20)
+rl_digit_val_3.entrena(X_val,y_val)
+score_digit_p_val_3 = rendimiento(rl_digit_val_3,X_test,y_test)
+print('score_digit_p_val_3: ', score_digit_p_val_3)
+
+# Con el conjunto de entrenamiento
+rl_digit=RegresionLogisticaOvR(rate=0.001,rate_decay=True,batch_tam=20)
+rl_digit.entrena(X_train,y_train)
+score_digit_e = rendimiento(rl_digit,X_train,y_train)
+print('score_digit_e: ', score_digit_e)
+score_digit_p = rendimiento(rl_digit,X_test,y_test)
+print('score_digit_p: ', score_digit_p)
