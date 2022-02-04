@@ -1066,18 +1066,20 @@ def readDigitFile(X_data_file_path, y_data_file_path):
     #prueba = np.genfromtxt(X_data_file_path, converters = )
     #print(prueba)
 
-trainingimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/trainingimages"
-traininglabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/traininglabels"
+import os
+root = os.getcwd() + '/datos/digitdata/'
+trainingimages_path = root + 'trainingimages'
+traininglabels_path = root + 'traininglabels'
 X_train, y_train = readDigitFile(trainingimages_path,traininglabels_path)
-validationimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/validationimages"
-validationlabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/validationlabels"
+validationimages_path = root + 'validationimages'
+validationlabels_path = root + 'validationlabels'
 X_val, y_val = readDigitFile(validationimages_path,validationlabels_path)
-testimages_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/testimages"
-testlabels_path = "Semana 5 - Implementación de algoritmos de aprendizaje/datos/digitdata/testlabels"
+testimages_path = root + 'testimages'
+testlabels_path = root + 'testlabels'
 X_test, y_test = readDigitFile(testimages_path,testlabels_path)
 
 # Con el conjunto de validacion para ver los parámetros
-rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
+'''rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
 rl_digit_val_1.entrena(X_val,y_val)
 score_digit_p_val_1 = rendimiento(rl_digit_val_1,X_test,y_test)
 print('score_digit_p_val_1: ', score_digit_p_val_1)
@@ -1098,4 +1100,4 @@ rl_digit.entrena(X_train,y_train)
 score_digit_e = rendimiento(rl_digit,X_train,y_train)
 print('score_digit_e: ', score_digit_e)
 score_digit_p = rendimiento(rl_digit,X_test,y_test)
-print('score_digit_p: ', score_digit_p)
+print('score_digit_p: ', score_digit_p)'''
