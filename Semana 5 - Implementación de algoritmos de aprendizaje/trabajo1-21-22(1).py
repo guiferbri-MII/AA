@@ -127,10 +127,6 @@ y_iris = carga_datos.y_iris
 # La división ha de ser ALEATORIA y ESTRATIFICADA respecto del valor de clasificación.
 
 def particion_entr_prueba(X,y,test=0.20):
-    num_test = int(X.shape[0]*test)
-    num_train = int(X.shape[0]*(1-test))
-    #X_train = y_train = np.empty((0,num_train))
-    #X_test = y_test = np.empty((0,num_test))
     X_train, X_test = np.empty((0,X.shape[1])), np.empty((0,X.shape[1]))
     y_train, y_test = np.empty((0,1)), np.empty((0,1))
     y_values = np.unique(y)
@@ -139,16 +135,11 @@ def particion_entr_prueba(X,y,test=0.20):
         y_value_indexes_random = np.random.permutation(y_value_indexes)
         num_train_prop = int((1-test)*len(y_value_indexes))
         index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
-        #print(X[index_train,:][0])
+
         X_train = np.append(X_train, X[index_train,:], axis = 0)
         X_test = np.append(X_test, X[index_test,:], axis = 0)
         y_train = np.append(y_train, y[index_train])        
         y_test = np.append(y_test, y[index_test])
-    '''indexes = np.random.permutation(X.shape[0])
-    index_train, index_test = indexes[:num_train], indexes[num_train:]
-    X_train, X_test = X[index_train,:], X[index_test,:]
-    y_train, y_test = y[index_train], y[index_test]
-    return X_train, X_test, y_train, y_test'''
     return X_train, X_test, y_train, y_test
 
 
@@ -379,14 +370,11 @@ class RegresionLogisticaMiniBatch():
         return normalizeData
     
     def pred(self, X, weights):
-        #print(weights)
         return 1/(1+np.e**(-np.dot(X, weights)))
 
     def entrena(self,entr,clas_entr,n_epochs=1000, reiniciar_pesos=False):
         self.y_class = np.unique(clas_entr)
         clas_entr = np.where(clas_entr == self.y_class[1], 1, 0)
-        #clas_entr = [0 if y == self.y_class[0] else 1 for y in clas_entr]
-        #clas_entr = np.array(clas_entr)
         X_train = entr
         if self.normalizacion:
             X_train = self.normalize(X_train)
@@ -395,9 +383,6 @@ class RegresionLogisticaMiniBatch():
             self.weights = np.random.uniform(-1, 1, (X_train.shape[1]+1,))
         
         num_batches = int(X_train.shape[0] / self.batch_tam)
-        #print(X_train.shape[0])
-        #print(self.batch_tam)
-        #print('num_batches: ', num_batches)
         weights = self.weights
         rate_0 = self.vrate
         
@@ -412,60 +397,24 @@ class RegresionLogisticaMiniBatch():
             for num_batch in range(num_batches):
                 X_mini_batch = X_train[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam, :]
                 Y_mini_batch = clas_entr[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam]
-                #X0 = np.ones((X_mini_batch.shape[0], 1))
-                #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
                 X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
                 
-                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
-                #o = self.prob(X_mini_batch, weights)
-                #sum = np.dot((Y_mini_batch - o), X_mini_batch)
-                #weights = weights + rate * np.dot((Y_mini_batch - o), X_mini_batch)
-                #weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
-                #o = np.dot(X_mini_batch,weights)
-                #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
-
-                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
-                #print('X_mini_batch,  ', X_mini_batch.shape)
                 o = self.pred(X_mini_batch, weights)
                 weights = weights + rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o)))
-                
-                '''print('num_batch: ', num_batch)
-                print('QUEEE: ', weights)
-                for j in range(len(weights)):
-                    for i in range(len(X_mini_batch)):
-                        #weight_aux = X_mini_batch[i][j] * (Y_mini_batch[i] - o[i])
-                        test = weights[j]
-                        weights[j] = test + rate * (X_mini_batch[i][j] * (Y_mini_batch[i] - o[i]))'''
+
             if X_train.shape[0] % self.batch_tam != 0:
                 X_mini_batch = X_train[num_batches*self.batch_tam : X_train.shape[0], :]
                 Y_mini_batch = clas_entr[num_batches*self.batch_tam : X_train.shape[0]]
-                #X0 = np.ones((X_mini_batch.shape[0], 1))
-                #X_mini_batch = np.append(X_mini_batch, X0, axis = 1)
                 X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
-                
-                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
-                #o = self.prob(X_mini_batch, weights)
-                #sum = np.dot((Y_mini_batch - o), X_mini_batch)
-                #weights = weights + rate * np.dot((Y_mini_batch - o), X_mini_batch)
-                #weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
-                #o = np.dot(X_mini_batch,weights)
-                #weights = weights + (rate * (np.dot(X_mini_batch, (Y_mini_batch - o))))
 
-                #o = 1/(1+np.e**(-np.dot(X_mini_batch, weights)))
                 o = self.pred(X_mini_batch, weights)
                 weights = weights + (rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o))))
-                '''for j in range(len(weights)):
-                    for i in range(len(X_mini_batch)):
-                        #weight_aux = X_mini_batch[i][j] * (Y_mini_batch[i] - o[i])
-                        test = weights[j]
-                        weights[j] = test + rate * (X_mini_batch[i][j] * (Y_mini_batch[i] - o[i]))'''
+                
             if self.rate_decay:
                 rate = (rate_0)*(1/(1+epoch))
 
         self.weights = weights
-        self.isTrain = True
-        #return weights
-            
+        self.isTrain = True            
 
     def clasifica_prob(self,E):
         #print('clasifica_prob')
@@ -474,28 +423,19 @@ class RegresionLogisticaMiniBatch():
         
         if self.normalizacion:
             E = (E - self.mean)/self.deviation
-        #X0 = np.ones((E.shape[0], 1))
-        #E_x = np.append(E, X0, axis = 1)
+        
         E_x = np.copy(E)
         E_x = np.insert(E_x, 0, 1, axis = 1)
         return self.pred(E_x, self.weights)
 
     def clasifica(self,E):
-        #print('clasifica')
         if not self.isTrain:
             raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
-        #if self.normalizacion:
-        #    E = (E - self.mean)/self.deviation
+            
         E_x = np.copy(E)
         y_proba = self.clasifica_prob(E_x)
-        #y_proba[y_proba >= 0.5] = self.y_class[1]
-        '''classification = np.empty((E.shape[0],1), dtype = self.y_class.dtype)
-        classification[y_proba >= 0.5] = self.y_class[1]
-        classification[y_proba < 0.5] = self.y_class[0]'''
         classification = np.where(y_proba > 0.5,self.y_class[1],self.y_class[0])
         return classification
-
-#         ......
 
 Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
 # ToDo: DESCOMENTAR!!!
@@ -619,9 +559,6 @@ print(score_cancer)'''
 def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
     num_fold = int(X.shape[0] / n)
     y_values = np.unique(y)
-    #print(np.unique(y,return_counts=True))
-    print('num_fold: ', num_fold)
-    #print(len(y))
     scores = []
     for i in range(n):
 
@@ -629,76 +566,21 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
         y_train_data, y_test_data = np.empty((0,1)), np.empty((0,1))
         for y_value in y_values:
             y_value_indexes = np.where(y == y_value)[0]
-            #print(len(y_value_indexes))
             y_value_indexes_random = np.random.permutation(y_value_indexes)
             y_prop = round(len(y_value_indexes)/len(y),2)
-            #print('PROPORCION del valor: ', y_value)
-            #print(y_prop)
             num_train_prop = int(round(y_prop*num_fold,0))
-            #print(num_train_prop)
             
             index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
             X_train_data = np.append(X_train_data, X[index_train,:], axis = 0)
             X_test_data = np.append(X_test_data, X[index_test,:], axis = 0)
             y_train_data = np.append(y_train_data, y[index_train])        
             y_test_data = np.append(y_test_data, y[index_test])
-            '''for y_value in y_values:
-                y_value_indexes = np.where(y == y_value)[0]
-                y_value_indexes_random = np.random.permutation(y_value_indexes)
-                num_train_prop = int((1-test)*len(y_value_indexes))
-                index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
-                #print(X[index_train,:][0])
-                X_train = np.append(X_train, X[index_train,:], axis = 0)
-                X_test = np.append(X_test, X[index_test,:], axis = 0)
-                y_train = np.append(y_train, y[index_train])        
-                y_test = np.append(y_test, y[index_test])'''
-            
-            '''index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
-            #print(X[index_train,:][0])
-            X_train = np.append(X_train, X[index_train,:], axis = 0)
-            X_test = np.append(X_test, X[index_test,:], axis = 0)
-            y_train = np.append(y_train, y[index_train])        
-            y_test = np.append(y_test, y[index_test])'''
-
-        #print('ESTRATIFICADOS?: ')
-        #print('y_train_data: ', np.unique(y_train_data,return_counts=True))
-        #print('y_test_data: ', np.unique(y_test_data,return_counts=True))
 
         classifier = clase_clasificador(**params)  
         classifier.entrena(X_train_data, y_train_data)
         score_fold = rendimiento(classifier,X_test_data,y_test_data)
-        #print('score_fold, ', score_fold)
-        scores.append(score_fold)        
+        scores.append(score_fold)
 
-        '''indexes = np.random.permutation(X.shape[0])
-        index_train, index_test = indexes[:num_train], indexes[num_train:]
-        X_train, X_test = X[index_train,:], X[index_test,:]
-        y_train, y_test = y[index_train], y[index_test]
-        return X_train, X_test, y_train, y_test'''
-        '''indexes = np.random.permutation(X.shape[0])
-        X_random = X[indexes]
-        y_random = y[indexes]
-
-        X_fold_test = X_random[i*num_fold : (i+1)*num_fold, :]
-        #X_fold_train = X[(i+2)*num_fold:,]
-        #print(i+n)
-        #X_fold_test = X[i*num_fold : (i+1)*num_fold]
-        X_fold_mask = np.isin(X_random, X_fold_test)
-        #X_fold_train = X[(i+n)*num_fold :]
-        X_fold_train = X_random[~X_fold_mask]
-        print('X_fold_test, ', X_fold_test)
-        #mask = np.isin(X, X_fold_test)
-        #prueba = np.delete(X, X_fold_test, axis = 0)
-        #prueba = X[~mask]
-        #print('prueba, ', prueba)
-        print('X_fold_train, ', X_fold_train)
-        Y_fold_test = y_random[i*num_fold : (i+1)*num_fold]
-        Y_fold_mask = np.isin(y_random, Y_fold_test)
-        Y_fold_train = y_random[~Y_fold_mask]
-        #Y_fold_train = y[(i+n)*num_fold:]
-        print('Y_fold_test, ', Y_fold_test)
-        print('Y_fold_train, ', Y_fold_train)'''
-    #print('SCORES: ', scores)
     scores_np = np.array(scores)
     return np.mean(scores_np)
 
@@ -831,31 +713,12 @@ class RegresionLogisticaOvR():
         if not self.isTrain:
             raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
         E_x = np.copy(E)
-        #best_model = self.models[1]
-        #best_proba = best_model.clasifica_prob(E_x)
-        #print(len(self.models))
-        #print('ccc, ', len(self.y_class))
         scores = []
-        #scores = np.zeros((len(self.y_class), E.shape[0]))
-        #cont = 0
         for model in self.models:
-            #print('AAA')
             model_proba = model.clasifica_prob(E_x)
-            #print(model_proba)
             scores.append(model_proba)
-            #scores[cont, :] = model_proba
-            '''if (model_proba > best_proba).all():
-                print('eeeee')
-                best_proba = model_proba
-                best_model = model'''
-            #cont += 1
         np_scores = np.asarray(scores)
         pred = np.argmax(np_scores, axis=0)
-        #print('pred, ', pred)
-        #max = np.amax(np_scores, axis=0)
-        #print(np.array(scores).shape)
-        #print('brbrbrbr, ', max)
-        #print('ffff, ', np.argmax(np_scores, axis=0))
         return self.y_class[pred]
 
 
@@ -912,44 +775,18 @@ print('score_iris_p: ', score_iris_p)'''
 
 def oneHot(X):
     X_code = np.copy(X)
-    #num_chars = 0
     oneHotEncode = np.zeros((X.shape[0],0))
-    #column_all = []
     for i in range(X.shape[1]):
         column_values = np.unique(X[:,i])
-        #print(column_values)
-        #num_chars += len(column_values)
-        #mapping = {}
-        #for x in range(len(column_values)):
-        #    mapping[column_values[x]] = x
-        #print('mapping, ', mapping)
         X_column = np.copy(X_code[:,i])
         for j in range(len(column_values)):
             X_column = np.where(X_column == column_values[j], j, X_column)
-            #column_all.append(column_values[j])
         X_column = X_column.astype(np.int32)
-        #print(X_column)
-        arr = np.zeros((X.shape[0],len(column_values)), dtype=np.int32)
-        #print(arr.shape)
-        arr[np.arange(X_column.size),X_column] = 1
-        #print('ARR',arr)
-        '''for j in range(X.shape[0]):
-            arr = list(np.zeros(len(column_values), dtype = int))
-            print('X_code ij', X_code[j][i])
-            print('mapping[X_code[j][i]]', mapping[X_code[j][i]])
-            arr[mapping[X_code[j][i]]] = 1
-            print('ARRRRR, ', arr)
-            if j == 5:
-                break'''
-        #print(one_hot_encode)
-        oneHotEncode = np.append(oneHotEncode, arr, axis = 1)
-        #arr[mapping[c]] = 1
-    #arr = list(np.zeros(len(column_values), dtype = int))
-    #print('num_chars, ', num_chars)
-    #column_all = np.array(column_all)
-    return oneHotEncode#, column_all
-#prueba = np.eye(X_credito.shape[1])[X_credito]
-#print(prueba[:5])
+        X_column_aux = np.zeros((X.shape[0],len(column_values)), dtype=np.int32)
+        X_column_aux[np.arange(X_column.size),X_column] = 1
+        oneHotEncode = np.append(oneHotEncode, X_column_aux, axis = 1)
+    return oneHotEncode
+
 '''print(X_credito.shape)
 X_reshape = np.reshape(X_credito,-1)
 nb_classes = X_credito.shape[1]
@@ -958,24 +795,6 @@ print(prueba[0])
 #print(np.unique(X_credito, axis = 0))'''
 
 X_credito_code = oneHot(X_credito)
-#print('AAAA',X_credito_code[:5])
-#X_credito_code_int = X_credito_code.astype(int)
-#X_reshape = np.reshape(X_credito_code_int,(X_credito.shape[0],-1))
-#prueba = np.eye(num_chars)[X_credito_code_int]
-#print(X_credito[0])
-#print(X_credito_code[0])
-'''print(X_credito[1])
-print(X_credito[2])
-print(X_credito[3])
-print(X_credito[4])
-vals = np.unique(X_credito[:,0])
-print(vals)
-print(np.arange(len(vals)))
-for i in range(len(vals)):
-    #print('i: ', i, ' vals: ', vals[i])
-    X_credito[:,0] = np.where(X_credito[:,0] == vals[i], i, X_credito[:,0])
-
-#print(X_credito[:5])'''
 # ToDo: DESCOMENTAR!!!
 '''
 Xe_credito,Xp_credito,ye_credito,yp_credito = particion_entr_prueba(X_credito_code,y_credito,test=1/3)
@@ -1021,62 +840,24 @@ def readDigitFile(X_data_file_path, y_data_file_path):
     X_data_file = open(X_data_file_path)
     lines = X_data_file.readlines()
     X_data = np.zeros((len(lines),size)).astype(np.int32)
-    #cont = 0
     for i in range(len(lines)):
         line = lines[i]
         line = line.replace('\n', '')
         np_line = np.array(list(line)).reshape(1,size)
         np_line = np.where((np_line == '+') | (np_line == '#'), 1, 0)
         X_data[i] = np_line
-        '''
-        np_line = np.array(list(line))
-        print('AAA, ', np_line)
-        print(np_line.shape)
-        
-        np_line_2 = np_line.reshape(1,size)
-        print('BBB, ', np_line_2)
-        print(np_line_2.shape)
-        np_line_2 = np.where((np_line_2 == '+') | (np_line_2 == '#'), 1, 0)
-        print('CCC')
-        print(np_line_2)
-        X_data[cont] = np_line_2
-        cont += 1
-        if cont == 10:
-            break'''
-    #X_data = np.array(lines)
-    #X_data_trans = np.where((X_data == '+') | (X_data == '#'), 1, 0)
-    #print(X_data[:30])
-    #print(lines[6])
-    #print(X_data[6])
-    #numbers = np.array_split(X_data, len(X_data)/28)
-    #numbers = [number.reshape(size*size,1) for number in numbers]
-    #np_numbers = np.asarray(numbers)
     np_numbers = X_data.reshape(int(len(X_data)/28),size*size)
     y_data_file = open(y_data_file_path)
     y_lines = y_data_file.readlines()
     y_lines = [line.replace('\n', '') for line in y_lines]
     y_data = np.array(y_lines)
-    #print(y_data.shape)
     return np_numbers, y_data
-    #numbers = [X_data[i:i+size] for i in range(0, len(X_data), size)]
-    '''print(len(numbers))
-    print(len(numbers[1]))
-    for numerito in numbers[1]:
-        print(numerito)'''
-    #prueba = np.genfromtxt(X_data_file_path, converters = )
-    #print(prueba)
 
 import os
 root = os.getcwd() + '/datos/digitdata/'
-trainingimages_path = root + 'trainingimages'
-traininglabels_path = root + 'traininglabels'
-X_train, y_train = readDigitFile(trainingimages_path,traininglabels_path)
-validationimages_path = root + 'validationimages'
-validationlabels_path = root + 'validationlabels'
-X_val, y_val = readDigitFile(validationimages_path,validationlabels_path)
-testimages_path = root + 'testimages'
-testlabels_path = root + 'testlabels'
-X_test, y_test = readDigitFile(testimages_path,testlabels_path)
+X_train, y_train = readDigitFile(root + 'trainingimages', root + 'traininglabels')
+X_val, y_val = readDigitFile(root + 'validationimages', root + 'validationlabels')
+X_test, y_test = readDigitFile(root + 'testimages', root + 'testlabels')
 
 # Con el conjunto de validacion para ver los parámetros
 '''rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
