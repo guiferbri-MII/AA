@@ -646,15 +646,37 @@ print(cancer_score_cross_val)'''
 # Mostrar el proceso realizado en cada caso, y los rendimientos finales obtenidos. 
 
 # Votos
-# ToDo: DESCOMENTAR!!!
-'''votes_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
-print(votes_score_cross_val)
+votes_score_cross_val_1 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
+votes_score_cross_val_2 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":20},Xe_votos,ye_votos,n=10)
+print('VOTOS')
+print('Rendimiento obtenido con los parámetros: batch_tam = 16, rate_decay = True, 5 particiones: ', votes_score_cross_val_1) #0.9345323741007194
+print('Rendimiento obtenido con los parámetros: batch_tam = 20, 10 particiones: ', votes_score_cross_val_2) #0.9207667731629392
+RLMN_votes_16=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
+RLMN_votes_16.entrena(Xe_votos,ye_votos)
+votes_score = rendimiento(RLMN_votes_16,Xp_votos,yp_votos)
+print('Rendimiento sobre el conjunto de pruebas: ', votes_score)
+
 # Cancer
-cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
-print(cancer_score_cross_val)
+print('\nCancer')
+cancer_score_cross_val_1 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+cancer_score_cross_val_2 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":25,"rate_decay":True},Xe_cancer,ye_cancer,n=10)
+print('Rendimiento obtenido con los parámetros: batch_tam = 16, rate_decay = True, 5 particiones: ', cancer_score_cross_val_1) #0.8983516483516484
+print('Rendimiento obtenido con los parámetros: batch_tam = 25, rate_decay = True, 10 particiones ', cancer_score_cross_val_2) #0.880195599022005
+RLMN_cancer_16=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
+RLMN_cancer_16.entrena(Xe_cancer,ye_cancer)
+cancer_score = rendimiento(RLMN_cancer_16,Xp_cancer,yp_cancer)
+print('Rendimiento sobre el conjunto de pruebas: ', cancer_score)
+
 # IMDB
-imdb_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},X_train_imdb,y_train_imdb,n=5)
-print(imdb_score_cross_val)''' 
+print('\nIMDB')
+imdb_score_cross_val_1 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},X_train_imdb,y_train_imdb,n=5)
+imdb_score_cross_val_2 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":25},X_train_imdb,y_train_imdb,n=10)
+print('Rendimiento obtenido con los parámetros: batch_tam = 16, rate_decay = True, 5 particiones: ', imdb_score_cross_val_1) #0.7185
+print('Rendimiento obtenido con los parámetros: batch_tam = 25, 10 particiones: ', imdb_score_cross_val_2) #0.6927222222222221
+RLMN_imdb_16=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
+RLMN_imdb_16.entrena(X_train_imdb,y_train_imdb)
+imdb_score = rendimiento(RLMN_imdb_16,X_test_imdb,y_test_imdb)
+print('Rendimiento sobre el conjunto de pruebas: ', imdb_score)
 
 # =====================================
 # EJERCICIO 5: CLASIFICACIÓN MULTICLASE
