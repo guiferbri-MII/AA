@@ -143,9 +143,9 @@ def particion_entr_prueba(X,y,test=0.20):
         y_test = np.append(y_test, y[index_test])
     return X_train, X_test, y_train, y_test
 
-
+print('EJERCICIO 1: SEPARACIÓN EN ENTRENAMIENTO Y PRUEBA (HOLDOUT)')
 Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
-print('VOTOS')
+print('\nVOTOS')
 print(y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
 print(np.unique(y_votos,return_counts=True))
 print(np.unique(ye_votos,return_counts=True))
@@ -364,7 +364,7 @@ class RegresionLogisticaMiniBatch():
 
     def entrena(self,entr,clas_entr,n_epochs=1000, reiniciar_pesos=False):
         self.y_class = np.unique(clas_entr)
-        clas_entr = np.where(clas_entr == self.y_class[1], 1, 0)
+        clas_entr = np.where(clas_entr == self.y_class[1], 1, 0) #Transformar clasicación a 0 y 1
         X_train = entr
         if self.normalizacion:
             X_train = self.normalize(X_train)
@@ -377,17 +377,15 @@ class RegresionLogisticaMiniBatch():
         rate_0 = self.vrate
         
         for epoch in range(n_epochs):
-            indexes_random = np.random.permutation(X_train.shape[0])
+            indexes_random = np.random.permutation(X_train.shape[0]) #En cada epoch, permutar el conjunto de entrenamiento de forma aleatoria
             X_train = X_train[indexes_random,:]
             clas_entr = clas_entr[indexes_random]
-
             rate = self.vrate
 
-            #ToDo: Unificar for y el if
             for num_batch in range(num_batches):
                 X_mini_batch = X_train[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam, :]
                 Y_mini_batch = clas_entr[num_batch*self.batch_tam : (num_batch+1)*self.batch_tam]
-                X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1)
+                X_mini_batch = np.insert(X_mini_batch, 0, 1, axis = 1) #Añadir el peso w0
                 
                 o = self.pred(X_mini_batch, weights)
                 weights = weights + rate * (np.dot(X_mini_batch.T, (Y_mini_batch - o)))
@@ -407,7 +405,6 @@ class RegresionLogisticaMiniBatch():
         self.isTrain = True            
 
     def clasifica_prob(self,E):
-        #print('clasifica_prob')
         if not self.isTrain:
             raise ClasificadorNoEntrenado("Primero debe entrenar el modelo")
         
@@ -426,20 +423,6 @@ class RegresionLogisticaMiniBatch():
         y_proba = self.clasifica_prob(E_x)
         classification = np.where(y_proba > 0.5,self.y_class[1],self.y_class[0])
         return classification
-
-Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
-# ToDo: DESCOMENTAR!!!
-'''RLMB_votos=RegresionLogisticaMiniBatch(normalizacion=True)
-#weigths = RLMB_votos.entrena(Xe_votos, ye_votos)
-#print('RESULT entrena:', weigths)
-RLMB_votos.entrena(Xe_votos, ye_votos)
-probabilidad = RLMB_votos.clasifica_prob(Xp_votos)
-#print('probabilidad')
-#print(probabilidad)
-clasificacion = RLMB_votos.clasifica(Xp_votos)
-#print('clasificacion')
-#print(clasificacion)'''
-
 
 
 # Ejemplos de uso:
@@ -482,10 +465,18 @@ def rendimiento(clasif,X,y):
     return sum(clasif.clasifica(X)==y)/y.shape[0]
         
 # In [6]: rendimiento(RLMB_votos,Xp_votos,yp_votos)
-# Out[6]: 0.9080459770114943    
-# ToDo: DESCOMENTAR!!!
-'''score_votes = rendimiento(RLMB_votos,Xp_votos,yp_votos)
-print(score_votes)'''
+# Out[6]: 0.9080459770114943   
+print('\nEJERCICIO 2: REGRESIÓN LOGÍSTICA MINI-BATCH')
+Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
+RLMB_votes=RegresionLogisticaMiniBatch(normalizacion=True)
+RLMB_votes.entrena(Xe_votos, ye_votos)
+pred_votes = RLMB_votes.clasifica_prob(Xp_votos)
+print('\nVOTOS')
+print('Predicción: ', pred_votes[:10])
+class_votes = RLMB_votes.clasifica(Xp_votos)
+print('Clasificacion: ', class_votes[:10])
+score_votes = rendimiento(RLMB_votes,Xp_votos,yp_votos)
+print('Rendimiento: ', score_votes)
 # ---------------------------------------------------------------------
 
 # CON LOS DATOS DEL CÀNCER
@@ -511,14 +502,15 @@ print(score_votes)'''
 # Out[11]: 0.9557522123893806
 
 Xe_cancer,Xp_cancer,ye_cancer,yp_cancer = particion_entr_prueba(X_cancer,y_cancer)
-# ToDo: DESCOMENTAR!!!
-'''RLMB_cancer=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
+print('\nCANCER')
+RLMB_cancer=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
 RLMB_cancer.entrena(Xe_cancer,ye_cancer)
-RLMB_cancer.clasifica_prob(Xp_cancer)
-#print(RLMB_cancer.clasifica(Xp_cancer))
+pred_cancer = RLMB_cancer.clasifica_prob(Xp_cancer)
+print('Predicción: ', pred_cancer[:10])
+class_cancer = RLMB_cancer.clasifica(Xp_cancer)
+print('Clasificacion: ', class_cancer[:10])
 score_cancer = rendimiento(RLMB_cancer,Xp_cancer,yp_cancer)
-print('score_cancer')
-print(score_cancer)'''
+print('Rendimiento: ', score_cancer)
 
 # =================================================
 # EJERCICIO 3: IMPLEMENTACIÓN DE VALIDACIÓN CRUZADA
