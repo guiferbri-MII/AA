@@ -548,9 +548,9 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
         y_train_data, y_test_data = np.empty((0,1)), np.empty((0,1))
         for y_value in y_values:
             y_value_indexes = np.where(y == y_value)[0]
-            y_value_indexes_random = np.random.permutation(y_value_indexes)
-            y_prop = round(len(y_value_indexes)/len(y),2)
-            num_train_prop = int(round(y_prop*num_fold,0))
+            y_value_indexes_random = np.random.permutation(y_value_indexes) #Índices del conjunto de forma aleatoria
+            y_prop = round(len(y_value_indexes)/len(y),2) #Proporción del valor de clasificación
+            num_train_prop = int(round(y_prop*num_fold,0)) #Número de elementos para el conjunto de entrenamiento
             
             index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
             X_train_data = np.append(X_train_data, X[index_train,:], axis = 0)
@@ -566,11 +566,9 @@ def rendimiento_validacion_cruzada(clase_clasificador,params,X,y,n=5):
     scores_np = np.array(scores)
     return np.mean(scores_np)
 
-X_prueba = np.array([11, 12, 13,14,15,16,17,18,19,20])
-Y_prueba = np.array([0,1,1,1,0,1,0,1,1,0])  
-# ToDo: DESCOMENTAR !!  
-'''cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
-print(cancer_score_cross_val)'''
+print("\nEJERCICIO 3: IMPLEMENTACIÓN DE VALIDACIÓN CRUZADA")
+cancer_score_cross_val = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_cancer,ye_cancer,n=5)
+print('Rendimiento validación cruzada (conjunto de Cancer): ', cancer_score_cross_val)
 
 # ------------------------------------------------------------------------------
 # Ejemplo:
