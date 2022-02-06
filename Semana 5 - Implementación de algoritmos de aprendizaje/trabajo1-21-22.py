@@ -782,34 +782,27 @@ def oneHot(X):
     X_code = np.copy(X)
     oneHotEncode = np.zeros((X.shape[0],0))
     for i in range(X.shape[1]):
-        column_values = np.unique(X[:,i])
+        column_values = np.unique(X[:,i]) #Posibles valores de la característica
         X_column = np.copy(X_code[:,i])
         for j in range(len(column_values)):
-            X_column = np.where(X_column == column_values[j], j, X_column)
+            X_column = np.where(X_column == column_values[j], j, X_column)  #Asignar un valor numérico
         X_column = X_column.astype(np.int32)
-        X_column_aux = np.zeros((X.shape[0],len(column_values)), dtype=np.int32)
+        X_column_aux = np.zeros((X.shape[0],len(column_values)), dtype=np.int32) #Array con tantas columnas como posibles valores de la característica
         X_column_aux[np.arange(X_column.size),X_column] = 1
         oneHotEncode = np.append(oneHotEncode, X_column_aux, axis = 1)
     return oneHotEncode
 
-'''print(X_credito.shape)
-X_reshape = np.reshape(X_credito,-1)
-nb_classes = X_credito.shape[1]
-prueba = np.eye(nb_classes)[X_reshape]
-print(prueba[0])
-#print(np.unique(X_credito, axis = 0))'''
-
+print("\nEJERCICIO 6: APLICACION A PROBLEMAS MULTICLASE")
+print("6.1) Conjunto de datos de la concesión de crédito")
+print('Credito')
 X_credito_code = oneHot(X_credito)
-# ToDo: DESCOMENTAR!!!
-'''
 Xe_credito,Xp_credito,ye_credito,yp_credito = particion_entr_prueba(X_credito_code,y_credito,test=1/3)
 rl_credito=RegresionLogisticaOvR(rate=0.001,batch_tam=20)
 rl_credito.entrena(Xe_credito,ye_credito)
-#print(X_credito_code.shape)
 score_credito_e = rendimiento(rl_credito,Xe_credito,ye_credito)
-print('score_credito_e: ', score_credito_e)
+print('Rendimiento sobre el cojunto de entrenamiento: ', score_credito_e)
 score_credito_p = rendimiento(rl_credito,Xp_credito,yp_credito)
-print('score_credito_p: ', score_credito_p)'''
+print('Rendimiento sobre el cojunto de prueba: ', score_credito_p)
 
 # ---------------------------------------------------------
 # 6.2) Clasificación de imágenes de dígitos escritos a mano
@@ -851,7 +844,7 @@ def readDigitFile(X_data_file_path, y_data_file_path):
         np_line = np.array(list(line)).reshape(1,size)
         np_line = np.where((np_line == '+') | (np_line == '#'), 1, 0)
         X_data[i] = np_line
-    np_numbers = X_data.reshape(int(len(X_data)/28),size*size)
+    np_numbers = X_data.reshape(int(len(X_data)/28),size*size) #Cada fila contiene cada número, y el número de columnas es el tamaño de un número: 28x28
     y_data_file = open(y_data_file_path)
     y_lines = y_data_file.readlines()
     y_lines = [line.replace('\n', '') for line in y_lines]
@@ -864,26 +857,28 @@ X_train, y_train = readDigitFile(root + 'trainingimages', root + 'traininglabels
 X_val, y_val = readDigitFile(root + 'validationimages', root + 'validationlabels')
 X_test, y_test = readDigitFile(root + 'testimages', root + 'testlabels')
 
+print("\n6.2) Clasificación de imágenes de dígitos escritos a mano")
+print('Dígitos')
 # Con el conjunto de validacion para ver los parámetros
-'''rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
+rl_digit_val_1 = RegresionLogisticaOvR(rate=0.001,batch_tam=20)
 rl_digit_val_1.entrena(X_val,y_val)
 score_digit_p_val_1 = rendimiento(rl_digit_val_1,X_test,y_test)
-print('score_digit_p_val_1: ', score_digit_p_val_1)
+print('Rendimiento obtenido con los parámetros rate=0.001, batch_tam=20: ', score_digit_p_val_1) #0.812
 
 rl_digit_val_2 = RegresionLogisticaOvR(rate=0.015,batch_tam=80)
 rl_digit_val_2.entrena(X_val,y_val)
 score_digit_p_val_2 = rendimiento(rl_digit_val_2,X_test,y_test)
-print('score_digit_p_val_2: ', score_digit_p_val_2)
+print('Rendimiento obtenido con los parámetros rate=0.015, batch_tam=80: ', score_digit_p_val_2) #0.821
 
 rl_digit_val_3 = RegresionLogisticaOvR(rate=0.001,rate_decay=True,batch_tam=20)
 rl_digit_val_3.entrena(X_val,y_val)
 score_digit_p_val_3 = rendimiento(rl_digit_val_3,X_test,y_test)
-print('score_digit_p_val_3: ', score_digit_p_val_3)
+print('Rendimiento obtenido con los parámetros rate=0.001, rate_decay=True, batch_tam=20: ', score_digit_p_val_3) #0.818
 
 # Con el conjunto de entrenamiento
-rl_digit=RegresionLogisticaOvR(rate=0.001,rate_decay=True,batch_tam=20)
+rl_digit=RegresionLogisticaOvR(rate=0.015,batch_tam=80)
 rl_digit.entrena(X_train,y_train)
 score_digit_e = rendimiento(rl_digit,X_train,y_train)
-print('score_digit_e: ', score_digit_e)
+print('Rendimiento sobre el cojunto de entrenamiento: ', score_digit_e)
 score_digit_p = rendimiento(rl_digit,X_test,y_test)
-print('score_digit_p: ', score_digit_p)'''
+print('Rendimiento sobre el cojunto de pruebas: ', score_digit_p)
