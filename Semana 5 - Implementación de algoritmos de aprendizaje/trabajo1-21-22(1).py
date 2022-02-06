@@ -626,6 +626,7 @@ print('Rendimiento validación cruzada (conjunto de Cancer): ', cancer_score_cro
 # Mostrar el proceso realizado en cada caso, y los rendimientos finales obtenidos. 
 
 # Votos
+print("\nEJERCICIO 4: APLICANDO LOS CLASIFICADORES BINARIOS")
 votes_score_cross_val_1 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
 votes_score_cross_val_2 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":20},Xe_votos,ye_votos,n=10)
 print('VOTOS')
