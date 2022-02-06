@@ -145,7 +145,7 @@ def particion_entr_prueba(X,y,test=0.20):
 
 print('EJERCICIO 1: SEPARACIÓN EN ENTRENAMIENTO Y PRUEBA (HOLDOUT)')
 Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
-print('\nVOTOS')
+print('\nVotos')
 print(y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
 print(np.unique(y_votos,return_counts=True))
 print(np.unique(ye_votos,return_counts=True))
@@ -153,7 +153,7 @@ print(np.unique(yp_votos,return_counts=True))
 
 
 Xe_credito,Xp_credito,ye_credito,yp_credito =particion_entr_prueba(X_credito,y_credito,test=0.4)
-print('\nCREDITO')
+print('\nCredito')
 print(np.unique(y_credito,return_counts=True))
 print(np.unique(ye_credito,return_counts=True))
 print(np.unique(yp_credito,return_counts=True))
@@ -471,7 +471,7 @@ Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos)
 RLMB_votes=RegresionLogisticaMiniBatch(normalizacion=True)
 RLMB_votes.entrena(Xe_votos, ye_votos)
 pred_votes = RLMB_votes.clasifica_prob(Xp_votos)
-print('\nVOTOS')
+print('\nVotos')
 print('Predicción: ', pred_votes[:10])
 class_votes = RLMB_votes.clasifica(Xp_votos)
 print('Clasificacion: ', class_votes[:10])
@@ -502,7 +502,7 @@ print('Rendimiento: ', score_votes)
 # Out[11]: 0.9557522123893806
 
 Xe_cancer,Xp_cancer,ye_cancer,yp_cancer = particion_entr_prueba(X_cancer,y_cancer)
-print('\nCANCER')
+print('\nCancer')
 RLMB_cancer=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
 RLMB_cancer.entrena(Xe_cancer,ye_cancer)
 pred_cancer = RLMB_cancer.clasifica_prob(Xp_cancer)
@@ -629,7 +629,7 @@ print('Rendimiento validación cruzada (conjunto de Cancer): ', cancer_score_cro
 print("\nEJERCICIO 4: APLICANDO LOS CLASIFICADORES BINARIOS")
 votes_score_cross_val_1 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":16,"rate_decay":True},Xe_votos,ye_votos,n=5)
 votes_score_cross_val_2 = rendimiento_validacion_cruzada(RegresionLogisticaMiniBatch, {"batch_tam":20},Xe_votos,ye_votos,n=10)
-print('VOTOS')
+print('Votos')
 print('Rendimiento obtenido con los parámetros: batch_tam = 16, rate_decay = True, 5 particiones: ', votes_score_cross_val_1) #0.9345323741007194
 print('Rendimiento obtenido con los parámetros: batch_tam = 20, 10 particiones: ', votes_score_cross_val_2) #0.9207667731629392
 RLMN_votes_16=RegresionLogisticaMiniBatch(batch_tam=16,rate_decay=True)
@@ -701,12 +701,12 @@ class RegresionLogisticaOvR():
         self.rate = rate
         self.rate_decay = rate_decay
         self.batch_tam = batch_tam
-        self.models = []
+        self.models = [] #Lista con los modelos entrenados
          
     def entrena(self,entr,clas_entr,n_epochs=1000):
         self.y_class = np.unique(clas_entr)
         for class_value in self.y_class:
-            clas_entr_trans = np.where(clas_entr == class_value, 1, 0)
+            clas_entr_trans = np.where(clas_entr == class_value, 1, 0) #La clase a 1, el resto de posibles valores a 0
             classifier = RegresionLogisticaMiniBatch(normalizacion=self.normalizacion, vrate=self.rate, rate_decay=self.rate_decay, batch_tam=self.batch_tam)
             classifier.entrena(entr, clas_entr_trans, n_epochs=n_epochs)
             self.models.append(classifier)
@@ -733,13 +733,15 @@ class RegresionLogisticaOvR():
 
 # --------------------------------------------------------------------
 # ToDo: DESCOMENTAR!!!
-'''Xe_iris,Xp_iris,ye_iris,yp_iris = particion_entr_prueba(X_iris,y_iris,test=1/3)
+print("\nEJERCICIO 5: CLASIFICACIÓN MULTICLASE")
+print('Iris')
+Xe_iris,Xp_iris,ye_iris,yp_iris = particion_entr_prueba(X_iris,y_iris,test=1/3)
 rl_iris=RegresionLogisticaOvR(rate=0.001,batch_tam=20)
 rl_iris.entrena(Xe_iris,ye_iris)
 score_iris_e = rendimiento(rl_iris,Xe_iris,ye_iris)
-print('score_iris_e: ', score_iris_e)
+print('Rendimiento sobre el cojunto de entrenamiento: ', score_iris_e)
 score_iris_p = rendimiento(rl_iris,Xp_iris,yp_iris)
-print('score_iris_p: ', score_iris_p)'''
+print('Rendimiento sobre el cojunto de pruebas: ', score_iris_p)
 
 # In[1] Xe_iris,Xp_iris,ye_iris,yp_iris          
 #            =particion_entr_prueba(X_iris,y_iris,test=1/3)
