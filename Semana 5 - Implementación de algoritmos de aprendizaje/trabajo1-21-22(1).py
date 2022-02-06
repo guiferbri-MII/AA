@@ -130,10 +130,11 @@ def particion_entr_prueba(X,y,test=0.20):
     X_train, X_test = np.empty((0,X.shape[1])), np.empty((0,X.shape[1]))
     y_train, y_test = np.empty((0,1)), np.empty((0,1))
     y_values = np.unique(y)
+    # Para cada posible valor de clasificación, mover de forma aleatoria los ejemplo y añadir el % correspondiente a la lista
     for y_value in y_values:
         y_value_indexes = np.where(y == y_value)[0]
-        y_value_indexes_random = np.random.permutation(y_value_indexes)
-        num_train_prop = int((1-test)*len(y_value_indexes))
+        y_value_indexes_random = np.random.permutation(y_value_indexes) #Índices de las permutaciones
+        num_train_prop = int((1-test)*len(y_value_indexes)) #Número de ejemplos de entrenamiento
         index_train, index_test = y_value_indexes_random[:num_train_prop], y_value_indexes_random[num_train_prop:]
 
         X_train = np.append(X_train, X[index_train,:], axis = 0)
@@ -143,31 +144,20 @@ def particion_entr_prueba(X,y,test=0.20):
     return X_train, X_test, y_train, y_test
 
 
-#Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
-# BORRAR
-'''#print(X_votos[0])
-#print(y_votos[0])
-#print(particion_entr_prueba(X_votos, y_votos))
-print('ye_votos[0]', ye_votos[0])
-print('Xe_votos[0]', Xe_votos[0])
-print(X_votos.shape,Xe_votos.shape,Xp_votos.shape)
-print(y_votos.shape,ye_votos.shape,yp_votos.shape)
+Xe_votos,Xp_votos,ye_votos,yp_votos = particion_entr_prueba(X_votos,y_votos,test=1/3)
+print('VOTOS')
 print(y_votos.shape[0],ye_votos.shape[0],yp_votos.shape[0])
 print(np.unique(y_votos,return_counts=True))
 print(np.unique(ye_votos,return_counts=True))
-print(np.unique(yp_votos,return_counts=True))'''
+print(np.unique(yp_votos,return_counts=True))
 
 
-#Xe_credito,Xp_credito,ye_credito,yp_credito =particion_entr_prueba(X_credito,y_credito,test=0.4)
-# BORRAR
-'''print('CREDITO')
+Xe_credito,Xp_credito,ye_credito,yp_credito =particion_entr_prueba(X_credito,y_credito,test=0.4)
+print('\nCREDITO')
 print(np.unique(y_credito,return_counts=True))
 print(np.unique(ye_credito,return_counts=True))
 print(np.unique(yp_credito,return_counts=True))
-print(X_credito.shape,Xe_credito.shape,Xp_credito.shape)
-print(y_credito.shape,ye_credito.shape,yp_credito.shape)
-print('ye_credito[0]', ye_credito[0])
-print('Xe_credito[0]', Xe_credito[0])'''
+
 # ------------------------------------------------------------------------------
 # Ejemplos:
 # =========
