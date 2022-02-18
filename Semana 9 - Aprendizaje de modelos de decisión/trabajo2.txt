@@ -1,0 +1,79 @@
+# =============================================================================
+# Aprendizaje automático 
+# Máster en Ingeniería Informática - Universidad de Sevilla
+# Curso 2021-22
+# Segundo trabajo práctico
+# =============================================================================
+
+
+# *****************************************************************************
+# HONESTIDAD ACADÉMICA Y COPIAS: un trabajo práctico es un examen, por lo que
+# debe realizarse de manera individual. La discusión y el intercambio de
+# información de carácter general con los compañeros se permite (e incluso se
+# recomienda), pero NO AL NIVEL DE CÓDIGO. Igualmente el remitir código de
+# terceros, OBTENIDO A TRAVÉS DE LA RED o cualquier otro medio, se considerará
+# plagio. 
+
+# Cualquier plagio o compartición de código que se detecte significará
+# automáticamente la calificación de CERO EN LA ASIGNATURA para TODOS los
+# alumnos involucrados. Por tanto a estos alumnos NO se les conservará, para
+# futuras convocatorias, ninguna nota que hubiesen obtenido hasta el momento.
+# SIN PERJUICIO DE OTRAS MEDIDAS DE CARÁCTER DISCIPLINARIO QUE SE PUDIERAN
+# TOMAR.
+# *****************************************************************************
+
+# En este trabajo se pide aplicar todo lo visto en la asignatura para analizar
+# un conjunto de datos de libre elección dentro de los propuestos y realizar el
+# correspondiente aprendizaje de modelos de decisión para el dominio que
+# describen los datos. Esto podría incluir las siguientes tareas: 
+#
+# * Preprocesado de los datos: Tratamiento de datos ausentes, tratamiento de 
+#   datos categóricos, discretizado, escalado, selección de características, 
+#   análisis de componentes principales. Se valorará la consideración de varias
+#   versiones del conjunto de datos original, obtenidas mediante distintas
+#   técnicas de preprocesado de datos, justificando adecuadamente su elección.
+# * Aprendizaje de modelos de decisión: Se considerarán todos los módelos vistos
+#   en la asignatura: Knn, árboles de decisión, ensemble learning con árboles de
+#   decisión, NaiveBayes, regresión logística, redes neuronales, modelos 
+#   lineales SVC. Se valorará asimismo el proceso de ajuste de parámetros 
+#   realizado para cada modelo desarrollado, en los casos en los que tenga
+#   sentido hacerlo, justificando adecuadamente la selección de los mejores
+#   parámetros. 
+# * Validación, ajuste y evaluación: Validación cruzada, métricas, matriz de
+#   confusión, curvas de validación. Se valorará la justificación de la validez
+#   de los mejores modelos obtenidos, basada en los resultados obtenidos en
+#   este apartado.
+#
+# En el trabajo se podrán utilizar libremente todas las herramientas
+# disponibles en las librerías Numpy, Scipy, Matplotlib, Pandas, Keras,
+# Scikit-Learn o cualquier otra que se considere necesaria para el desarrollo.
+#
+# El trabajo debe ser presentado mediante un notebook de Jupyter, intercalando
+# texto, código Python y gráficos, si fueran necesarios. El conjunto de datos
+# particular sobre el que hacer el estudio es de libre elección dentro de la
+# siguiente propuesta: 
+#
+# Del repositorio "UCI Machine Learning Repository"
+# * Hepatitis Data Set
+#   https://archive.ics.uci.edu/ml/datasets/Hepatitis
+# * Glass Identification Data Set
+#   https://archive.ics.uci.edu/ml/datasets/Glass+Identification
+# * MAGIC Gamma Telescope Data Set
+#   https://archive.ics.uci.edu/ml/datasets/MAGIC+Gamma+Telescope
+# * Algerian Forest Fires Data Set
+#   https://archive.ics.uci.edu/ml/datasets/Algerian+Forest+Fires+Dataset++
+# * Adult Data Set
+#   https://archive.ics.uci.edu/ml/datasets/Adult
+#
+# Es importante identificar correctamente el campo de clasificación en el
+# conjunto de datos escogido, para ello es recomendable consultar la
+# descripción del conjunto de datos (disponible en la página web indicada),
+# donde se proporcionan más detalles sobre los mismos.
+# 
+# El notebook desarrollado deberá ser entregado a través de la plataforma de
+# enseñanza virtual y NO DEBE incluirse ningún fichero con los datos
+# utilizados, solo la referencia de los mismos. Cualquier operación de
+# preprocesado de datos debe incluirse en la sesión de trabajo de Jupyter para
+# que pueda reproducirse sin necesidad de hacer ninguna modificación adicional.
+
+# =============================================================================
